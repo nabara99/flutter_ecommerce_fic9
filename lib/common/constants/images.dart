@@ -11,6 +11,7 @@ class Images {
 
   //icon user
   static const String iconUser = 'assets/icons/User.png';
+  static const String iconTrash = 'assets/icons/Trash.png';
 
   static const String product1 = 'assets/images/product1.png';
   static const String product2 = 'assets/images/product2.png';

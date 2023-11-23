@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_fic9_ecommerce/common/constants/colors.dart';
+import 'package:flutter_fic9_ecommerce/presentation/home/bloc/products/products_bloc.dart';
 
 import '../../common/components/search_input.dart';
 import '../../common/components/spaces.dart';
 import '../../common/constants/images.dart';
-import 'product_model.dart';
+import '../cart/bloc/cart/cart_bloc.dart';
+import '../cart/cart_page.dart';
 import 'widgets/category_button.dart';
 import 'widgets/image_slider.dart';
 import 'widgets/product_card.dart';
+import 'package:badges/badges.dart' as badges;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,28 +22,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late TextEditingController searchController;
-  final List<ProductModel> products = [
-    ProductModel(
-      images: [Images.product1],
-      name: 'Tas Kekinian',
-      price: 200000,
-    ),
-    ProductModel(
-      images: [Images.product2],
-      name: 'Earphone',
-      price: 199000,
-    ),
-    ProductModel(
-      images: [Images.product3],
-      name: 'Sepatu Pria',
-      price: 700000,
-    ),
-    ProductModel(
-      images: [Images.product4],
-      name: 'Earphone',
-      price: 670000,
-    ),
-  ];
 
   @override
   void initState() {
@@ -102,18 +84,44 @@ class _HomePageState extends State<HomePage> {
               const Spacer(),
               Row(
                 children: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SizedBox()),
+                  badges.Badge(
+                    badgeContent: BlocBuilder<CartBloc, CartState>(
+                      builder: (context, state) {
+                        return state.maybeWhen(
+                          orElse: () {
+                            return const Text(
+                              '0',
+                              style: TextStyle(color: Colors.white),
+                            );
+                          },
+                          loaded: (carts) {
+                            int totalQuantity = 0;
+                            for (var cart in carts) {
+                              totalQuantity += cart.quantity;
+                            }
+                            return Text(
+                              totalQuantity.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         );
                       },
-                      icon: Image.asset(
-                        Images.iconBuy,
-                        height: 24.0,
-                      )),
+                    ),
+                    child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const CartPage()),
+                          );
+                        },
+                        icon: Image.asset(
+                          Images.iconBuy,
+                          height: 24.0,
+                        )),
+                  ),
                   IconButton(
                     onPressed: () {
                       Navigator.push(
@@ -191,18 +199,32 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SpaceHeight(8.0),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10.0,
-              mainAxisSpacing: 55.0,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) => ProductCard(
-              data: products[index],
-            ),
+          BlocBuilder<ProductsBloc, ProductsState>(
+            builder: (context, state) {
+              return state.maybeWhen(
+                orElse: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+                loaded: (model) {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 55.0,
+                    ),
+                    itemCount: model.data.length,
+                    itemBuilder: (context, index) => ProductCard(
+                      data: model.data[index],
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

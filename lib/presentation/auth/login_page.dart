@@ -7,7 +7,8 @@ import '../../common/components/custom_text_field.dart';
 import '../../common/components/spaces.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/images.dart';
-import '../home/dashboard_page.dart';
+import '../../data/datasources/auth_local_datasource.dart';
+import '../dashboard/dashboard_page.dart';
 import 'bloc/login/login_bloc.dart';
 import 'register_page.dart';
 
@@ -46,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           const SpaceHeight(24.0),
           const Center(
             child: Text(
-              "FIC 9",
+              "Naurapedia",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -81,7 +82,8 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               state.maybeWhen(
                 orElse: () {},
-                success: (data) {
+                success: (data) async {
+                  AuthLocalDatasource().saveAuthData(data);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
