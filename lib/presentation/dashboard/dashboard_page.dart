@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/images.dart';
 import '../auth/account/account_page.dart';
+import '../cart/cart_page.dart';
 import '../home/home_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -20,7 +21,7 @@ class _DashboardPageState extends State<DashboardPage> {
     const Center(
       child: Text('Explore Page'),
     ),
-    const Center(child: Text('Cart Page')),
+    const CartPage(),
     const AccountPage(),
   ];
 
